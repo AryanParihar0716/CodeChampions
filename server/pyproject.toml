@@ -1,0 +1,16 @@
+[project]
+name = "aura-server"
+version = "0.1.0"
+description = "AURA Agentic Travel Brain"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "langgraph",
+    "langchain-openai",
+    "python-dotenv",
+]
+
+[tool.uv]
+dev-dependencies = []

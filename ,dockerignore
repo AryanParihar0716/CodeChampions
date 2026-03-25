@@ -1,0 +1,15 @@
+# Ignore Python local environments
+server/.venv/
+server/__pycache__/
+.venv/
+__pycache__/
+
+# Ignore Node local environments
+client/node_modules/
+client/.next/
+node_modules/
+.next/
+
+# Ignore secrets and OS junk
+.env
+.DS_Store

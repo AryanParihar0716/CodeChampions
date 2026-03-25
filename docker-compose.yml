@@ -1,15 +1,23 @@
 services:
-  app:
-    build:
-      context: .
-      dockerfile: .devcontainer/Dockerfile
-    volumes:
-      - .:/workspace:cached
-    network_mode: service:db # Shares network with DB
-
-  db:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_PASSWORD: password
+  server:
+    build: ./server
+    container_name: aura-server
     ports:
-      - "5432:5432"
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - UV_LINK_MODE=copy # This stops the hardlink warning
+    volumes:
+      - ./server:/app
+
+  client:
+    build: ./client
+    container_name: aura-client
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/app
+      - /app/node_modules # MAGIC LINE: Keeps libraries inside Docker
+      - /app/.next       # MAGIC LINE: Keeps build cache inside Docker
+    depends_on:
+      - server
