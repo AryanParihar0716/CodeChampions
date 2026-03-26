@@ -27,6 +27,7 @@ export default function LoginForm({ onSwitch, onOTP }: any) {
         const res = await fetch("http://localhost:8000/api/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
+            credentials: "include",
             body: JSON.stringify({ 
                 identifier: form.identifier, 
                 password: form.password 

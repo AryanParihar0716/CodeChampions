@@ -459,7 +459,10 @@ export default function OTPView({ destination, onSuccess }: any) {
   const handleVerify = async () => {
     if (otp.join("").length < 6) return;
     
-    const res = await fetch("http://localhost:8000/api/verify", { method: "POST" });
+    const res = await fetch("http://localhost:8000/api/verify", { 
+      method: "POST",
+      credentials: "include"
+    });
     if (res.ok) {
       setVerified(true);
       setTimeout(() => {
