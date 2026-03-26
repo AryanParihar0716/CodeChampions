@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
-  },
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "server": "cd ../server && uv run uvicorn main:app --reload"
+},
   "dependencies": {
     "next": "16.2.1",
     "react": "19.2.4",

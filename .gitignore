@@ -1,0 +1,29 @@
+# --- SENSITIVE DATA (NEVER PUSH) ---
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+*.key
+
+# --- BACKEND (Python/FastAPI) ---
+server/.venv/
+server/__pycache__/
+server/*.pyc
+server/.pytest_cache/
+.venv/
+__pycache__/
+
+# --- FRONTEND (Next.js/Node) ---
+client/node_modules/
+client/.next/
+client/out/
+client/build/
+node_modules/
+.next/
+
+# --- OS SPECIFIC ---
+.DS_Store
+Thumbs.db
+*.log
