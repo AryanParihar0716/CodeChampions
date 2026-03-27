@@ -5,7 +5,7 @@ To upgrade: replace `_get_weather()` with an OpenWeatherMap or WeatherAPI call.
 Free tier: https://openweathermap.org/api
 """
 
-_MOCK_WEATHER: dict[str, dict] = {
+"""_MOCK_WEATHER: dict[str, dict] = {
     "Thailand": {
         "temp": "32°C", "condition": "☀️ Sunny & Humid",
         "best_season": "Nov – Feb (cool & dry)",
@@ -66,7 +66,7 @@ _DEFAULT_WEATHER = {
 
 
 def weather_node(state: dict) -> dict:
-    """LangGraph node: fetches weather info for the destination."""
+    LangGraph node: fetches weather info for the destination.
     dest = state.get("destination", "").strip().title()
     weather = _MOCK_WEATHER.get(dest, _DEFAULT_WEATHER)
 
@@ -77,3 +77,37 @@ def weather_node(state: dict) -> dict:
             "agent": "Weather Intel Agent",
         }
     }
+"""
+import os
+import requests
+from dotenv import load_dotenv
+
+load_dotenv()
+WEATHER_KEY = os.getenv("OPENWEATHER_API_KEY")
+
+def weather_node(state: dict) -> dict:
+    dest = state.get("destination", "")
+    print(f"☁️ WEATHER AGENT: Fetching live data for {dest}...")
+    
+    # Using metric units for Celsius
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={dest}&appid={WEATHER_KEY}&units=metric"
+    
+    try:
+        res = requests.get(url).json()
+        
+        # Extracting key data points
+        temp = res.get("main", {}).get("temp", "22")
+        humidity = res.get("main", {}).get("humidity", "50")
+        condition = res.get("weather", [{}])[0].get("description", "clear sky").title()
+        
+        return {
+            "weather_result": {
+                "temp": f"{int(temp)}°C",
+                "condition": condition,
+                "humidity": f"{humidity}%",
+                "tip": "Perfect for sightseeing!" if temp < 30 else "Stay hydrated, it's warm!"
+            }
+        }
+    except Exception as e:
+        print(f"❌ Weather Error: {e}")
+        return {"weather_result": None}

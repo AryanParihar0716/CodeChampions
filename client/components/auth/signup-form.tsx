@@ -104,7 +104,7 @@ export default function SignupView({ onSwitch, onOTP }: any) {
     </div>
   );
 }*/
-"use client";
+/*"use client";
 import { useState } from "react";
 import { FloatingInput, PrimaryButton } from "./ui-elements";
 
@@ -112,25 +112,38 @@ export default function SignupView({ onSwitch, onOTP }: any) {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
-  const handleCreate = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("http://localhost:8000/api/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(form),
-      });
+ // Inside your SignupForm component
+const handleCreate = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
 
-      if (res.ok) {
-        onOTP(form.email); // 🚀 Success! Push to OTP view
-      }
-    } catch (err) {
-      console.error("Signup Error:", err);
-    } finally {
-      setLoading(false);
+  try {
+    const response = await fetch("http://127.0.0.1:8000/api/signup", { // 🚀 Use 127.0.0.1 instead of localhost
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      }),
+    });
+
+    if (response.ok) {
+      // Logic for moving to OTP view
+      setStep("otp"); 
+    } else {
+      const errorData = await response.json();
+      alert(errorData.detail || "Signup failed");
     }
-  };
+  } catch (error) {
+    console.error("Signup Error:", error);
+    alert("Backend Server is Offline. Make sure your FastAPI server is running on port 8000.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -143,6 +156,68 @@ export default function SignupView({ onSwitch, onOTP }: any) {
       <PrimaryButton onClick={handleCreate} loading={loading}>Create Account</PrimaryButton>
       <button onClick={onSwitch} className="text-sm text-slate-500 hover:text-cyan-400 w-full text-center">
         Already a traveler? Sign In
+      </button>
+    </div>
+  );
+}*/
+"use client";
+import { useState } from "react";
+import { FloatingInput, PrimaryButton } from "./ui-elements";
+
+export default function SignupView({ onSwitch, onOTP }: any) {
+  // 🚀 Your state is called 'form'
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+
+  const handleCreate = async () => {
+    setLoading(true);
+
+    try {
+      // 🚀 Using 127.0.0.1 is the safest bet for Windows/FastAPI
+      const response = await fetch("http://127.0.0.1:8000/api/signup", { 
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: form.name,      // ✅ Fixed: was formData.name
+          email: form.email,    // ✅ Fixed: was formData.email
+          password: form.password, // ✅ Fixed: was formData.password
+        }),
+      });
+
+      if (response.ok) {
+        // 🚀 Move to the OTP screen using the prop passed from auth/page.tsx
+        onOTP(form.email); 
+      } else {
+        const errorData = await response.json();
+        alert(errorData.detail || "Signup failed");
+      }
+    } catch (error) {
+      console.error("Signup Error:", error);
+      alert("Backend Offline. Check if your FastAPI terminal shows 'Uvicorn running'.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6 animate-in fade-in duration-500">
+      <header>
+        <h2 className="text-3xl font-bold font-serif">Join AURA</h2>
+        <p className="text-xs text-slate-500 mt-1 font-mono uppercase tracking-widest">Initialization Phase // 01</p>
+      </header>
+      
+      <div className="space-y-4">
+        <FloatingInput label="Full Name" value={form.name} onChange={(v:string) => setForm({...form, name:v})} />
+        <FloatingInput label="Email Address" value={form.email} onChange={(v:string) => setForm({...form, email:v})} />
+        <FloatingInput label="Password" type="password" value={form.password} onChange={(v:string) => setForm({...form, password:v})} />
+      </div>
+
+      <PrimaryButton onClick={handleCreate} loading={loading}>Create Account</PrimaryButton>
+      
+      <button onClick={onSwitch} className="text-sm text-slate-500 hover:text-cyan-400 w-full text-center transition-colors">
+        Already a traveler? <span className="text-cyan-500 font-bold">Sign In</span>
       </button>
     </div>
   );
