@@ -10,6 +10,10 @@ dependencies = [
     "langgraph",
     "langchain-openai",
     "python-dotenv",
+    "google-genai",
+    "sqlalchemy",
+    "alembic",
+    "dateparser",
 ]
 
 [tool.uv]

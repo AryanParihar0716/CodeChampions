@@ -33,6 +33,8 @@ export default function OTPView({ onBack, destination, onSuccess }: any) {
   const handleVerify = () => {
     if (otp.join("").length === 6) {
       setVerified(true);
+      // Set authentication token for middleware
+      document.cookie = "aura_token=demo_token_123; path=/; max-age=86400"; // 24 hours
       setTimeout(() => onSuccess?.(), 1500);
     }
   };
@@ -446,7 +448,7 @@ const handleVerify = async () => {
     </div>
   );
 }*/
-"use client";
+/*"use client";
 import { useState, useRef } from "react";
 import { CheckCircle2, ShieldCheck } from "lucide-react";
 import { PrimaryButton } from "./ui-elements";
@@ -499,6 +501,77 @@ export default function OTPView({ destination, onSuccess }: any) {
         ))}
       </div>
       <PrimaryButton onClick={handleVerify}>Verify & Continue</PrimaryButton>
+    </div>
+  );
+}*/
+"use client";
+import { useState, useRef } from "react";
+import { CheckCircle2, ShieldCheck } from "lucide-react";
+import { PrimaryButton } from "./ui-elements";
+
+export default function OTPView({ destination, onSuccess }: any) {
+  const [verified, setVerified] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const handleVerify = async () => {
+    const otpCode = otp.join("");
+    if (otpCode.length < 6) return;
+    
+    setLoading(true);
+    try {
+      const res = await fetch("http://localhost:8000/api/verify", { 
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          email: destination, // Your email variable
+          otp: otpCode        // The '123456'
+        })
+      });
+
+      if (res.ok) {
+        setVerified(true);
+        setTimeout(() => onSuccess(), 1200);
+      } else {
+        alert("Invalid OTP. Use 123456 for the demo.");
+      }
+    } catch (e) {
+      console.error("Connection error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (verified) return (
+    <div className="text-center space-y-4 animate-in zoom-in duration-500">
+      <CheckCircle2 size={64} className="text-cyan-400 mx-auto" />
+      <h2 className="text-2xl font-bold text-white">Identity Verified</h2>
+    </div>
+  );
+
+  return (
+    <div className="space-y-8 text-center">
+      <div className="mx-auto w-12 h-12 bg-cyan-500/10 rounded-xl flex items-center justify-center">
+        <ShieldCheck className="text-cyan-400" />
+      </div>
+      <h2 className="text-2xl font-bold text-white">Enter OTP</h2>
+      <div className="flex gap-2 justify-center">
+        {otp.map((digit, i) => (
+          <input
+            key={i} ref={(el) => { inputRefs.current[i] = el; }}
+            className="w-12 h-16 rounded-xl bg-white/5 border border-white/10 text-center text-2xl font-bold text-white outline-none focus:border-cyan-400"
+            maxLength={1} value={digit}
+            onChange={(e) => {
+                const next = [...otp]; next[i] = e.target.value; setOtp(next);
+                if (e.target.value && i < 5) inputRefs.current[i+1]?.focus();
+            }}
+          />
+        ))}
+      </div>
+      <PrimaryButton onClick={handleVerify} loading={loading}>
+        {loading ? "Verifying..." : "Verify & Continue"}
+      </PrimaryButton>
     </div>
   );
 }

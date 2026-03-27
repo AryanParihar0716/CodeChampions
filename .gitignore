@@ -11,3 +11,5 @@ client/.env.local
 # Windows/Mac junk
 .DS_Store
 Thumbs.db
+
+.env.example
